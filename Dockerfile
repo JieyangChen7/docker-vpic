@@ -1,4 +1,4 @@
-from randalburns/pvcat:pv501ubu16
+from cjy7117/pvcat
 
 # remove proxies
 #ENV http_proxy=''
@@ -7,14 +7,11 @@ from randalburns/pvcat:pv501ubu16
 #ENV HTTPS_PROXy=''
 #ENV ALL_PROXY=''
 
-ARG uid
-ARG gid
-
 # follow instructions in https://github.com/docker/docker/issues/5663
 RUN sed -ri 's/^session\s+required\s+pam_loginuid.so$/session optional pam_loginuid.so/' /etc/pam.d/sshd
 
 # create a vpic user
-RUN groupadd -r vpic -g $gid && useradd -r -m -g vpic -u $uid vpic
+RUN groupadd -r vpic && useradd -r -m -g vpic vpic
 
 # setup ssh keys and config
 COPY id_rsa /home/vpic/.ssh/
@@ -64,7 +61,7 @@ ADD machinefile /home/vpic
 
 USER root
 RUN apt-get -y install emacs
-
+RUN mkdir /var/run/sshd
 
 WORKDIR /home/vpic
 
