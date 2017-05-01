@@ -1,11 +1,9 @@
 from cjy7117/pvcat
 
-# remove proxies
-ENV http_proxy=''
-ENV https_proxy=''
-ENV HTTP_PROXY=''
-ENV HTTPS_PROXy=''
-ENV ALL_PROXY=''
+RUN echo "Acquire::http::Proxy \"http://proxyout.lanl.gov:8080\";" >> /etc/apt/apt.conf
+RUN echo "Acquire::https::Proxy \"http://proxyout.lanl.gov:8080\";" >> /etc/apt/apt.conf
+ENV http_proxy=http://proxyout.lanl.gov:8080
+ENV https_proxy=http://proxyout.lanl.gov:8080
 
 # follow instructions in https://github.com/docker/docker/issues/5663
 RUN sed -ri 's/^session\s+required\s+pam_loginuid.so$/session optional pam_loginuid.so/' /etc/pam.d/sshd
@@ -54,12 +52,10 @@ RUN git submodule update
 #RUN make -j16
 
 # add the launcher scripts for the docker file
-ADD launch.sh /home/vpic
-ADD launch_sshd.sh /home/vpic
 ADD runvpic.sh /home/vpic
-ADD machinefile /home/vpic
 
 USER root
+RUN apt-get update
 RUN apt-get -y install emacs
 RUN mkdir /var/run/sshd
 
