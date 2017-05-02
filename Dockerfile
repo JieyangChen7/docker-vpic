@@ -1,29 +1,30 @@
 from cjy7117/pvcat
 
 # remove proxies
-ENV http_proxy=''
-ENV https_proxy=''
-ENV HTTP_PROXY=''
-ENV HTTPS_PROXy=''
-ENV ALL_PROXY=''
+#ENV http_proxy=''
+#ENV https_proxy=''
+#ENV HTTP_PROXY=''
+#ENV HTTPS_PROXy=''
+#ENV ALL_PROXY=''
 
 # follow instructions in https://github.com/docker/docker/issues/5663
 RUN sed -ri 's/^session\s+required\s+pam_loginuid.so$/session optional pam_loginuid.so/' /etc/pam.d/sshd
 
 # create a vpic user
-RUN groupadd -r vpic && useradd -r -m -g vpic vpic
+#RUN groupadd -r vpic && useradd -r -m -g vpic vpic
 
 # setup ssh keys and config
-COPY id_rsa /home/vpic/.ssh/
-COPY id_rsa.pub /home/vpic/.ssh/
-COPY config /home/vpic/.ssh/
-RUN chown -R vpic:vpic /home/vpic/.ssh; chmod 0700 /home/vpic/.ssh; chmod 0600 /home/vpic/.ssh/*
+RUN mkdir /root/.ssh
+COPY id_rsa /root/.ssh/
+COPY id_rsa.pub /root/.ssh/
+COPY config /root/.ssh/
+RUN chmod 0700 /root/.ssh; chmod 0600 /root/.ssh/*
 RUN sed -i 's/Port 22/Port 9222/' /etc/ssh/sshd_config
 
 # add no password login
-RUN cat /home/vpic/.ssh/id_rsa.pub >> /home/vpic/.ssh/authorized_keys
+RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 
-RUN chown -R vpic:vpic /home/vpic
+#RUN chown -R vpic:vpic /home/vpic
 
 
 # get more recent cmake as required for vpic
@@ -34,12 +35,12 @@ RUN tar -xzf cmake-3.5.2-Linux-x86_64.tar.gz
 ENV PATH /usr/local/cmake-3/cmake-3.5.2-Linux-x86_64/bin:$PATH
 
 
-USER vpic
-WORKDIR /home/vpic
+#USER vpic
+WORKDIR /root
 
 #RUN git clone --recursive https://github.com/losalamos/vpic.git
 RUN git clone https://github.com/demarle/vpic.git
-WORKDIR /home/vpic/vpic
+WORKDIR /root/vpic
 RUN git checkout -b dockerify origin/dockerify
 RUN git submodule init
 RUN git submodule update
@@ -54,15 +55,16 @@ RUN git submodule update
 #RUN make -j16
 
 # add the launcher scripts for the docker file
-ADD launch.sh /home/vpic
-ADD launch_sshd.sh /home/vpic
-ADD runvpic.sh /home/vpic
-ADD machinefile /home/vpic
+#ADD launch.sh /home/vpic
+#ADD launch_sshd.sh /home/vpic
+#ADD runvpic.sh /home/vpic
+#ADD machinefile /home/vpic
 
 USER root
+RUN apt-get update
 RUN apt-get -y install emacs
 RUN mkdir /var/run/sshd
 
-WORKDIR /home/vpic
+#WORKDIR /home/vpic
 
 USER root
