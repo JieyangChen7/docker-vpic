@@ -1,5 +1,10 @@
 #/bin/bash                                                                                                                                          
 
+# Configure Darshan before running
+/usr/projects/darshan/sw/darwin/bin/darshan-mk-log-dirs.pl
+export LD_PRELOAD=/usr/projects/darshan/sw/darwin/lib/libdarshan.so 
+
+
 mkdir -p /home/vpic/vpic.bin
 
 cd /home/vpic/vpic.bin
